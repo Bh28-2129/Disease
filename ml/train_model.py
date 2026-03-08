@@ -182,7 +182,26 @@ def save_artifacts(model, scaler, metrics, feature_cols):
     joblib.dump(model,  os.path.join(out_dir, "diabetes_model.pkl"))
     joblib.dump(scaler, os.path.join(out_dir, "scaler.pkl"))
 
-    meta = {**metrics, "feature_columns": feature_cols}
+    # Extract full inference parameters so Node.js can predict without Python
+    if hasattr(model, 'coef_'):
+        # LogisticRegression
+        coef      = [round(float(c), 6) for c in model.coef_[0]]
+        intercept = round(float(model.intercept_[0]), 6)
+    else:
+        # RandomForest — store as None (Node.js will use scaler+RF is not portable; fallback handled)
+        coef      = None
+        intercept = None
+
+    meta = {
+        **metrics,
+        "feature_columns":  feature_cols,
+        # Scaler parameters for JS-side standardisation
+        "scaler_mean":  [round(float(v), 6) for v in scaler.mean_],
+        "scaler_scale": [round(float(v), 6) for v in scaler.scale_],
+        # Logistic Regression coefficients
+        "coef":      coef,
+        "intercept": intercept,
+    }
     with open(os.path.join(out_dir, "model_meta.json"), "w") as f:
         json.dump(meta, f, indent=2)
 

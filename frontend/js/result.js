@@ -3,7 +3,7 @@
  * Reads from sessionStorage (set by predict.js) or falls back to report_id query param
  */
 
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = "/api";
 
 // ─────────────────────────────────────────────
 // Color mappings

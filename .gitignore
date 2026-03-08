@@ -4,7 +4,6 @@ ml/__pycache__/
 ml/*.pyc
 ml/diabetes_model.pkl
 ml/scaler.pkl
-ml/model_meta.json
 
 # Node.js
 backend/node_modules/

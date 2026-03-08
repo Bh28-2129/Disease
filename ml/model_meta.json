@@ -1,0 +1,56 @@
+{
+  "model_type": "LogisticRegression",
+  "accuracy": 0.8182,
+  "auc_roc": 0.9165,
+  "feature_importances": {
+    "Pregnancies": 0.1724,
+    "Glucose": 1.5408,
+    "BloodPressure": 0.3839,
+    "SkinThickness": 0.7251,
+    "Insulin": 0.5939,
+    "BMI": 0.885,
+    "DiabetesPedigreeFunction": 0.553,
+    "Age": 0.5527
+  },
+  "feature_columns": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age"
+  ],
+  "scaler_mean": [
+    2.869707,
+    119.983713,
+    70.822476,
+    28.700326,
+    67.705212,
+    31.266275,
+    0.366794,
+    33.066775
+  ],
+  "scaler_scale": [
+    1.696699,
+    30.605929,
+    11.425274,
+    11.245619,
+    65.594744,
+    7.126938,
+    0.291558,
+    9.313248
+  ],
+  "coef": [
+    0.17243,
+    1.540755,
+    0.38387,
+    0.725094,
+    0.593941,
+    0.885039,
+    0.553034,
+    0.552684
+  ],
+  "intercept": -0.462145
+}

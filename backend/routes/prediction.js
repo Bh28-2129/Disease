@@ -1,14 +1,69 @@
-// routes/prediction.js — Calls Python Flask ML API and saves result to DB
+// routes/prediction.js — ML inference in Node.js (no Python dependency)
 const express   = require("express");
-const axios     = require("axios");
 const jwt       = require("jsonwebtoken");
+const path      = require("path");
 const { body, validationResult } = require("express-validator");
 const { pool }  = require("../db");
 const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
-const ML_URL    = process.env.ML_API_URL || "http://localhost:5001";
 const JWT_SECRET = process.env.JWT_SECRET || "medai_jwt_secret_please_change_me_in_production";
+
+// ─────────────────────────────────────────────
+// Load model parameters from model_meta.json
+// ─────────────────────────────────────────────
+const META = require(path.join(__dirname, "../../ml/model_meta.json"));
+
+// Logistic Regression inference (pure JS)
+function predictDiabetes(features) {
+  const { coef, intercept, scaler_mean, scaler_scale } = META;
+
+  // Standardise: z = (x - mean) / scale
+  const scaled = features.map((v, i) => (v - scaler_mean[i]) / scaler_scale[i]);
+
+  // Linear combination
+  let logit = intercept;
+  for (let i = 0; i < coef.length; i++) logit += coef[i] * scaled[i];
+
+  // Sigmoid
+  const probability = 1 / (1 + Math.exp(-logit));
+  return probability;
+}
+
+const SUGGESTIONS = {
+  high: [
+    "Consult an endocrinologist or your primary care physician immediately.",
+    "Monitor fasting blood glucose levels regularly.",
+    "Adopt a low-glycemic index diet — reduce refined sugars and white carbs.",
+    "Exercise at least 30 minutes daily (brisk walk, cycling, swimming).",
+    "Lose 5–10% of body weight if BMI > 25, as it significantly reduces risk.",
+    "Limit alcohol consumption and quit smoking if applicable.",
+    "Stay hydrated — drink 8–10 glasses of water daily.",
+    "Get HbA1c and lipid profile tested every 3–6 months.",
+  ],
+  moderate: [
+    "Schedule a health checkup with your doctor within the next 1–2 months.",
+    "Reduce daily sugar and processed carbohydrate intake.",
+    "Incorporate 20–30 minutes of physical activity most days.",
+    "Monitor weight and aim for a healthy BMI (18.5–24.9).",
+    "Increase dietary fiber — whole grains, vegetables, legumes.",
+    "Manage stress with mindfulness, yoga, or adequate sleep (7–8 hrs).",
+    "Check blood pressure and glucose levels every 6 months.",
+  ],
+  low: [
+    "Maintain your current healthy lifestyle — keep it up!",
+    "Continue regular physical activity (150 min/week moderate exercise).",
+    "Eat a balanced diet rich in fruits, vegetables, and whole grains.",
+    "Get an annual health checkup to track key biomarkers.",
+    "Stay mindful of family history and schedule genetic counseling if needed.",
+  ],
+};
+
+function riskBand(probability) {
+  if (probability >= 0.60) return { risk_level: "High",     risk_color: "danger"  };
+  if (probability >= 0.35) return { risk_level: "Moderate", risk_color: "warning" };
+  return                          { risk_level: "Low",      risk_color: "success" };
+}
 
 // Try to extract user from Authorization header (non-fatal)
 function extractUserFromToken(req) {
@@ -41,7 +96,6 @@ const validateInput = [
 // POST /api/predict
 // ─────────────────────────────────────────────
 router.post("/", validateInput, async (req, res) => {
-  // Validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -53,25 +107,57 @@ router.post("/", validateInput, async (req, res) => {
     session_id,
   } = req.body;
 
-  // Extract logged-in user from JWT token if present
   const tokenUser = extractUserFromToken(req);
 
   try {
-    // 1) Call Python ML API
-    const mlResponse = await axios.post(`${ML_URL}/predict`, {
-      pregnancies, glucose, blood_pressure, skin_thickness,
-      insulin, bmi, diabetes_pedigree, age,
-    }, { timeout: 15000 });
+    // ── Inline ML inference (no Python API needed) ──
+    const features = [
+      parseFloat(pregnancies),
+      parseFloat(glucose),
+      parseFloat(blood_pressure),
+      parseFloat(skin_thickness),
+      parseFloat(insulin),
+      parseFloat(bmi),
+      parseFloat(diabetes_pedigree),
+      parseInt(age),
+    ];
 
-    const result = mlResponse.data;
+    const probability = predictDiabetes(features);
+    const probPct     = Math.round(probability * 1000) / 10; // e.g. 67.3
+    const prediction  = probability >= 0.5 ? 1 : 0;
+    const { risk_level, risk_color } = riskBand(probability);
+    const suggestions = SUGGESTIONS[risk_level.toLowerCase()] || SUGGESTIONS.moderate;
+
+    const featureLabels = META.feature_columns || Object.keys(META.feature_importances);
+    const featureValues = featureLabels.map(k => META.feature_importances[k]);
+
+    const result = {
+      prediction,
+      probability:          probPct,
+      risk_level,
+      risk_color,
+      suggestions,
+      model_type:           META.model_type,
+      accuracy:             META.accuracy,
+      feature_labels:       featureLabels,
+      feature_importances:  featureValues,
+      input_data: {
+        Pregnancies:              pregnancies,
+        Glucose:                  glucose,
+        BloodPressure:            blood_pressure,
+        SkinThickness:            skin_thickness,
+        Insulin:                  insulin,
+        BMI:                      bmi,
+        DiabetesPedigreeFunction: diabetes_pedigree,
+        Age:                      age,
+      },
+    };
+
     const sid = session_id || uuidv4();
-
-    // 2 & 3) Save to DB — fully non-fatal; predictions work without a DB
     let reportId  = null;
     let createdAt = new Date().toISOString();
 
     try {
-      // Resolve user ID: prefer logged-in JWT user, else upsert by email
       let userId = tokenUser ? tokenUser.userId : null;
       if (!userId && email) {
         const userRes = await pool.query(
@@ -102,8 +188,7 @@ router.post("/", validateInput, async (req, res) => {
       reportId  = reportRes.rows[0].id;
       createdAt = reportRes.rows[0].created_at;
     } catch (dbErr) {
-      // DB unavailable — still return the ML prediction result
-      console.warn("[DB] Save skipped (DB unavailable):", dbErr.message);
+      console.warn("[DB] Save skipped:", dbErr.message);
     }
 
     return res.status(200).json({
@@ -114,14 +199,6 @@ router.post("/", validateInput, async (req, res) => {
     });
 
   } catch (err) {
-    if (err.code === "ECONNREFUSED" || err.code === "ECONNRESET") {
-      return res.status(503).json({
-        error: "AI model service is unavailable. Please ensure the Python ML API is running.",
-      });
-    }
-    if (err.response) {
-      return res.status(err.response.status).json({ error: err.response.data });
-    }
     console.error("[Prediction Error]", err.message);
     return res.status(500).json({ error: "Internal server error during prediction." });
   }
@@ -130,13 +207,13 @@ router.post("/", validateInput, async (req, res) => {
 // ─────────────────────────────────────────────
 // GET /api/predict/model-info
 // ─────────────────────────────────────────────
-router.get("/model-info", async (req, res) => {
-  try {
-    const info = await axios.get(`${ML_URL}/model-info`, { timeout: 5000 });
-    return res.json(info.data);
-  } catch {
-    return res.status(503).json({ error: "ML API unavailable" });
-  }
+router.get("/model-info", (req, res) => {
+  return res.json({
+    model_type:           META.model_type,
+    accuracy:             META.accuracy,
+    auc_roc:              META.auc_roc,
+    feature_importances:  META.feature_importances,
+  });
 });
 
 module.exports = router;

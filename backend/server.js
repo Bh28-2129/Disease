@@ -76,7 +76,7 @@ app.use((err, req, res, next) => {
 });
 
 // ─────────────────────────────────────────────
-// Start Server
+// Start Server (local) or export for Vercel
 // ─────────────────────────────────────────────
 const start = async () => {
   try {
@@ -86,7 +86,6 @@ const start = async () => {
       console.log(" AI Disease Risk Prediction — Backend  ");
       console.log("========================================");
       console.log(` Server:   http://localhost:${PORT}`);
-      console.log(` ML API:   ${process.env.ML_API_URL || "http://localhost:5001"}`);
       console.log(` DB:       ${process.env.DATABASE_URL ? "Connected" : "Not configured"}`);
       console.log("========================================");
     });
@@ -96,4 +95,12 @@ const start = async () => {
   }
 };
 
-start();
+// On Vercel the module is imported; locally we call start()
+if (require.main === module) {
+  start();
+} else {
+  // Vercel serverless: init DB once then export app
+  initDB().catch(err => console.error("[DB init]", err.message));
+}
+
+module.exports = app;

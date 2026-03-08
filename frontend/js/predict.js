@@ -3,7 +3,7 @@
  * Sends form data to Node.js backend → stores result → redirects to result.html
  */
 
-const API_BASE    = "http://localhost:3001/api";
+const API_BASE    = "/api";
 const SESSION_KEY = "medai_session_id";
 
 // ─────────────────────────────────────────────

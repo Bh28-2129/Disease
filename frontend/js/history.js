@@ -3,7 +3,7 @@
  * Loads previous assessments from the backend, renders stats + table + trend chart
  */
 
-const API_BASE    = "http://localhost:3001/api";
+const API_BASE    = "/api";
 const SESSION_KEY = "medai_session_id";
 const PAGE_SIZE   = 10;
 
