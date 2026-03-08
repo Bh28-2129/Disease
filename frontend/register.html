@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — MedAI Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <i class="bi bi-heart-pulse-fill me-2"></i>MedAI Predictor
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-fill me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="predict.html"><i class="bi bi-clipboard2-pulse me-1"></i>Assess Risk</a></li>
+          <li class="nav-item"><a class="nav-link" href="history.html"><i class="bi bi-clock-history me-1"></i>History</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+
+        <div class="text-center mb-4">
+          <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;">
+            <i class="bi bi-person-plus-fill fs-3"></i>
+          </div>
+          <h2 class="fw-bold">Create an Account</h2>
+          <p class="text-muted">Sign up to track your health assessments over time.</p>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <div id="alertBox" class="alert d-none" role="alert"></div>
+
+            <form id="registerForm" novalidate>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Full Name</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="name" placeholder="e.g. John Doe" required minlength="2" maxlength="120" />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" id="email" placeholder="you@example.com" required />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" id="password" placeholder="At least 6 characters" required minlength="6" />
+                  <button type="button" class="btn btn-outline-secondary" id="togglePwd">
+                    <i class="bi bi-eye" id="eyeIcon"></i>
+                  </button>
+                </div>
+                <div class="form-text">Minimum 6 characters.</div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Confirm Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                  <input type="password" class="form-control" id="confirmPassword" placeholder="Repeat your password" required />
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" id="registerBtn">
+                <i class="bi bi-person-check-fill me-2"></i>Create Account
+              </button>
+            </form>
+
+            <hr class="my-4" />
+            <p class="text-center text-muted mb-0">
+              Already have an account?
+              <a href="login.html" class="text-primary fw-semibold text-decoration-none">Sign in &rarr;</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (localStorage.getItem("medai_token")) {
+      window.location.href = "predict.html";
+    }
+
+    // Toggle password visibility
+    document.getElementById("togglePwd").addEventListener("click", () => {
+      const pwd  = document.getElementById("password");
+      const icon = document.getElementById("eyeIcon");
+      if (pwd.type === "password") {
+        pwd.type  = "text";
+        icon.className = "bi bi-eye-slash";
+      } else {
+        pwd.type  = "password";
+        icon.className = "bi bi-eye";
+      }
+    });
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn     = document.getElementById("registerBtn");
+      const alertEl = document.getElementById("alertBox");
+
+      const name            = document.getElementById("name").value.trim();
+      const email           = document.getElementById("email").value.trim();
+      const password        = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (!name || !email || !password || !confirmPassword) {
+        showAlert(alertEl, "danger", "Please fill in all fields.");
+        return;
+      }
+      if (password.length < 6) {
+        showAlert(alertEl, "danger", "Password must be at least 6 characters.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        showAlert(alertEl, "danger", "Passwords do not match.");
+        return;
+      }
+
+      btn.disabled  = true;
+      btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Creating account…`;
+      alertEl.classList.add("d-none");
+
+      try {
+        const res  = await fetch("/api/auth/register", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ name, email, password }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.errors ? data.errors[0].msg : data.error || "Registration failed.");
+        }
+
+        // Store token and user info
+        localStorage.setItem("medai_token", data.token);
+        localStorage.setItem("medai_user",  JSON.stringify(data.user));
+
+        showAlert(alertEl, "success", "Account created! Redirecting…");
+        setTimeout(() => { window.location.href = "predict.html"; }, 1000);
+
+      } catch (err) {
+        showAlert(alertEl, "danger", err.message);
+        btn.disabled  = false;
+        btn.innerHTML = `<i class="bi bi-person-check-fill me-2"></i>Create Account`;
+      }
+    });
+
+    function showAlert(el, type, msg) {
+      el.className = `alert alert-${type}`;
+      el.textContent = msg;
+    }
+  </script>
+</body>
+</html>

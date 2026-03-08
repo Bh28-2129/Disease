@@ -1,0 +1,273 @@
+/* ================================================
+   MedAI Predictor — Custom Styles
+   ================================================ */
+
+/* ────── CSS Variables ────── */
+:root {
+  --primary:    #1a73e8;
+  --danger:     #dc3545;
+  --warning:    #fd7e14;
+  --success:    #28a745;
+  --text-dark:  #212529;
+  --text-muted: #6c757d;
+  --bg-light:   #f8f9fa;
+  --card-radius: 16px;
+}
+
+/* ────── Base ────── */
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-light);
+}
+
+/* ────── Navbar ────── */
+.navbar-brand {
+  font-size: 1.25rem;
+  letter-spacing: -0.3px;
+}
+
+/* ────── Disclaimer Banner ────── */
+.disclaimer-banner {
+  background: #fff3cd;
+  border-bottom: 1px solid #ffc107;
+  font-size: 0.85rem;
+  color: #664d03;
+}
+
+/* ────── Hero Section ────── */
+.hero-section {
+  background: linear-gradient(135deg, #f0f4ff 0%, #fafbff 100%);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.stat-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Hero Card Stack */
+.hero-card-stack {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 360px;
+}
+.hero-card {
+  border-radius: var(--card-radius);
+  position: relative;
+  z-index: 2;
+}
+.hero-card-bg {
+  border-radius: var(--card-radius);
+  margin-top: 12px;
+  z-index: 1;
+}
+.risk-indicator {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.risk-indicator.high {
+  background: #fff5f5;
+  color: var(--danger);
+}
+
+/* ────── Feature Cards ────── */
+.feature-card {
+  border-radius: var(--card-radius);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+}
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ────── Step Cards ────── */
+.step-card {
+  padding: 20px;
+}
+.step-number {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* ────── Form Page ────── */
+.card {
+  border-radius: var(--card-radius);
+}
+.card-header {
+  border-radius: var(--card-radius) var(--card-radius) 0 0 !important;
+}
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+}
+.input-group-text {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: var(--text-muted);
+}
+
+/* ────── Result Page ────── */
+
+/* Risk Panel */
+.risk-panel {
+  transition: background 0.3s;
+  border-radius: var(--card-radius) 0 0 var(--card-radius);
+}
+.risk-panel.high     { background: linear-gradient(135deg, #dc3545, #c82333); }
+.risk-panel.moderate { background: linear-gradient(135deg, #fd7e14, #e96c00); }
+.risk-panel.low      { background: linear-gradient(135deg, #28a745, #20963a); }
+
+.risk-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.risk-icon {
+  font-size: 2rem;
+  color: white;
+}
+.risk-icon::before {
+  font-family: "bootstrap-icons";
+}
+.risk-icon.high::before     { content: "\f335"; } /* exclamation-triangle */
+.risk-icon.moderate::before { content: "\f30d"; } /* dash-circle */
+.risk-icon.low::before      { content: "\f26b"; } /* check-circle */
+
+/* Progress Bar Colors */
+.progress-bar.high     { background: var(--danger); }
+.progress-bar.moderate { background: var(--warning); }
+.progress-bar.low      { background: var(--success); }
+
+/* Suggestion Cards */
+.suggestion-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid var(--primary);
+  transition: background 0.2s;
+}
+.suggestion-card:hover {
+  background: #e8f0fe;
+}
+.suggestion-card.high     { border-left-color: var(--danger); }
+.suggestion-card.moderate { border-left-color: var(--warning); }
+.suggestion-card.low      { border-left-color: var(--success); }
+
+/* ────── History Page ────── */
+.stat-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Risk badges */
+.badge-high     { background: #fde8ea; color: var(--danger); }
+.badge-moderate { background: #fff3e0; color: var(--warning); }
+.badge-low      { background: #e8f5e9; color: var(--success); }
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Table */
+.table-hover tbody tr:hover { background: #f0f4ff; }
+
+/* ────── Gauge Chart Overlay ────── */
+.risk-gauge-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+.risk-gauge-wrap canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* ────── Animations ────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.4); }
+  50%       { box-shadow: 0 0 0 10px rgba(220,53,69,0); }
+}
+.pulse-danger {
+  animation: pulse-red 2s infinite;
+}
+
+/* ────── Responsive Tweaks ────── */
+@media (max-width: 768px) {
+  .hero-section { min-height: auto; }
+  .risk-panel   { border-radius: var(--card-radius) var(--card-radius) 0 0; }
+}
+
+/* ────── Utility ────── */
+.cursor-pointer { cursor: pointer; }
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+code {
+  font-size: 0.75rem;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #c7254e;
+}

@@ -1,0 +1,20 @@
+# Python
+ml/venv/
+ml/__pycache__/
+ml/*.pyc
+ml/diabetes_model.pkl
+ml/scaler.pkl
+ml/model_meta.json
+
+# Node.js
+backend/node_modules/
+backend/.env
+
+# Environment
+.env
+*.env.local
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log

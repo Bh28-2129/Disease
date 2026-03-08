@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diabetes Risk Assessment — MedAI Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <i class="bi bi-heart-pulse-fill me-2"></i>MedAI Predictor
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto" id="navLinks">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-fill me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="predict.html"><i class="bi bi-clipboard2-pulse me-1"></i>Assess Risk</a></li>
+          <li class="nav-item"><a class="nav-link" href="history.html"><i class="bi bi-clock-history me-1"></i>History</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer-banner py-2">
+    <div class="container text-center">
+      <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+      <strong>Important:</strong> This tool provides AI-based estimates only. It does <strong>NOT</strong>
+      replace professional medical diagnosis. Please consult a doctor.
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <!-- Page Header -->
+        <div class="text-center mb-4">
+          <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-2">
+            <i class="bi bi-droplet-half me-1"></i>Diabetes Risk Assessment
+          </span>
+          <h2 class="fw-bold">Enter Your Health Details</h2>
+          <p class="text-muted">All fields are used by the AI model. Provide accurate values for best results.</p>
+        </div>
+
+        <!-- Assessment Form -->
+        <form id="predictionForm" class="needs-validation" novalidate>
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+              <h6 class="mb-0"><i class="bi bi-person-fill me-2"></i>Personal Information (Optional)</h6>
+            </div>
+            <div class="card-body p-4">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Your Name <small class="text-muted">(optional)</small></label>
+                  <input type="text" class="form-control" id="name" name="name" placeholder="e.g. John Doe" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Email Address <small class="text-muted">(optional, for report)</small></label>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="e.g. john@email.com" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+              <h6 class="mb-0"><i class="bi bi-activity me-2"></i>Health Metrics</h6>
+            </div>
+            <div class="card-body p-4">
+              <div class="row g-4">
+
+                <!-- Age -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Age <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                    <input type="number" class="form-control" id="age" name="age" min="1" max="120"
+                           placeholder="21–81" required />
+                    <span class="input-group-text">years</span>
+                  </div>
+                  <div class="invalid-feedback">Please enter a valid age (1–120).</div>
+                  <div class="form-text">Your current age in years.</div>
+                </div>
+
+                <!-- BMI -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">
+                    BMI <span class="text-danger">*</span>
+                    <button type="button" class="btn btn-sm btn-link p-0 ms-1" data-bs-toggle="modal" data-bs-target="#bmiModal">
+                      <i class="bi bi-calculator text-primary"></i>
+                    </button>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-arms-up"></i></span>
+                    <input type="number" class="form-control" id="bmi" name="bmi" min="10" max="80" step="0.1"
+                           placeholder="e.g. 28.5" required />
+                    <span class="input-group-text">kg/m²</span>
+                  </div>
+                  <div class="invalid-feedback">BMI must be between 10 and 80.</div>
+                  <div class="form-text">Normal: 18.5–24.9 | Overweight: 25–29.9 | Obese: ≥30</div>
+                </div>
+
+                <!-- Glucose -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Fasting Glucose Level <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-droplet"></i></span>
+                    <input type="number" class="form-control" id="glucose" name="glucose" min="44" max="300"
+                           placeholder="e.g. 120" required />
+                    <span class="input-group-text">mg/dL</span>
+                  </div>
+                  <div class="invalid-feedback">Glucose must be between 44 and 300.</div>
+                  <div class="form-text">Normal fasting: &lt;100 | Pre-diabetic: 100–125 | Diabetic: ≥126</div>
+                </div>
+
+                <!-- Blood Pressure -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Diastolic Blood Pressure <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-heart-pulse"></i></span>
+                    <input type="number" class="form-control" id="blood_pressure" name="blood_pressure" min="20" max="180"
+                           placeholder="e.g. 80" required />
+                    <span class="input-group-text">mmHg</span>
+                  </div>
+                  <div class="invalid-feedback">Blood pressure must be between 20 and 180.</div>
+                  <div class="form-text">Diastolic (lower number). Normal: &lt;80</div>
+                </div>
+
+                <!-- Insulin -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">2-Hour Serum Insulin <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-capsule"></i></span>
+                    <input type="number" class="form-control" id="insulin" name="insulin" min="0" max="900"
+                           placeholder="e.g. 79" required />
+                    <span class="input-group-text">μU/mL</span>
+                  </div>
+                  <div class="invalid-feedback">Insulin value must be 0–900. Enter 0 if unknown.</div>
+                  <div class="form-text">2-hour post-load. Normal: 16–166 μU/mL. Enter 0 if not available.</div>
+                </div>
+
+                <!-- Skin Thickness -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Skin Thickness <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-rulers"></i></span>
+                    <input type="number" class="form-control" id="skin_thickness" name="skin_thickness" min="0" max="110"
+                           placeholder="e.g. 23" required />
+                    <span class="input-group-text">mm</span>
+                  </div>
+                  <div class="invalid-feedback">Skin thickness must be 0–110. Enter 0 if unknown.</div>
+                  <div class="form-text">Triceps skin fold thickness. Average: 20–35 mm. Enter 0 if not available.</div>
+                </div>
+
+                <!-- Pregnancies -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Number of Pregnancies <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-gender-female"></i></span>
+                    <input type="number" class="form-control" id="pregnancies" name="pregnancies" min="0" max="20"
+                           placeholder="e.g. 2" required />
+                    <span class="input-group-text">times</span>
+                  </div>
+                  <div class="invalid-feedback">Enter 0–20 (male users: enter 0).</div>
+                  <div class="form-text">Times pregnant. Males: enter 0.</div>
+                </div>
+
+                <!-- Diabetes Pedigree -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">
+                    Diabetes Pedigree Function <span class="text-danger">*</span>
+                    <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip"
+                       title="A function scoring the likelihood of diabetes based on family history. Range: 0.05–2.5"></i>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-people"></i></span>
+                    <input type="number" class="form-control" id="diabetes_pedigree" name="diabetes_pedigree"
+                           min="0.05" max="3" step="0.01" placeholder="e.g. 0.48" required />
+                  </div>
+                  <div class="invalid-feedback">Value must be between 0.05 and 3.</div>
+                  <div class="form-text">
+                    Family history score: Low (&lt;0.3) | Medium (0.3–0.8) | High (&gt;0.8)
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-1" data-bs-toggle="modal" data-bs-target="#pedigreeModal">
+                      How to calculate?
+                    </button>
+                  </div>
+                </div>
+
+              </div><!-- /.row -->
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid gap-2">
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-lg py-3 shadow">
+              <i class="bi bi-robot me-2"></i>Analyze My Risk with AI
+            </button>
+          </div>
+
+          <div id="formError" class="alert alert-danger mt-3 d-none" role="alert"></div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- BMI Calculator Modal -->
+  <div class="modal fade" id="bmiModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="bi bi-calculator me-2"></i>BMI Calculator</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Height</label>
+              <div class="input-group">
+                <input type="number" id="heightInput" class="form-control" placeholder="170">
+                <span class="input-group-text">cm</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Weight</label>
+              <div class="input-group">
+                <input type="number" id="weightInput" class="form-control" placeholder="70">
+                <span class="input-group-text">kg</span>
+              </div>
+            </div>
+          </div>
+          <div id="bmiResult" class="mt-3 text-center d-none">
+            <h3 id="bmiValue" class="fw-bold"></h3>
+            <p id="bmiCategory" class="text-muted"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-secondary" id="calcBMI">Calculate</button>
+          <button class="btn btn-primary" id="useBMI" disabled>Use This BMI</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pedigree Modal -->
+  <div class="modal fade" id="pedigreeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title"><i class="bi bi-people me-2"></i>Diabetes Pedigree Function Guide</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>The Diabetes Pedigree Function (DPF) estimates your genetic risk based on family history.</p>
+          <table class="table table-bordered">
+            <thead class="table-light"><tr><th>Family History</th><th>Suggested DPF Range</th></tr></thead>
+            <tbody>
+              <tr><td>No diabetic relatives</td><td>0.08 – 0.20</td></tr>
+              <tr><td>1 distant relative (grandparent/aunt/uncle)</td><td>0.20 – 0.40</td></tr>
+              <tr><td>1 parent or sibling with diabetes</td><td>0.40 – 0.70</td></tr>
+              <tr><td>Both parents with diabetes</td><td>0.70 – 1.20</td></tr>
+              <tr><td>Multiple relatives across generations</td><td>1.20 – 2.42</td></tr>
+            </tbody>
+          </table>
+          <p class="text-muted small">Use the midpoint of the most applicable range if unsure.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light py-4 mt-5">
+    <div class="container text-center">
+      <p class="mb-1"><i class="bi bi-heart-pulse-fill text-danger me-2"></i><strong>MedAI Predictor</strong></p>
+      <p class="small text-muted mb-0">⚠️ Not medical advice. For educational purposes only.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/predict.js"></script>
+</body>
+</html>
